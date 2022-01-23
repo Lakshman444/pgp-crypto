@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:crypto="http://www.mulesoft.org/schema/mule/crypto" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/crypto http://www.mulesoft.org/schema/mule/crypto/current/mule-crypto.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f58f0e94-53a2-4a1f-8c38-5457efdad718" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<crypto:pgp-config name="Crypto_Pgp" doc:name="Crypto Pgp" doc:id="7eb41f1e-7335-4385-baf9-7230161ac939" publicKeyring="mule_pub.gpg" >
+		<crypto:pgp-key-infos >
+			<crypto:pgp-asymmetric-key-info keyId="lucky1234" fingerprint="58CE643E4619AB23" />
+		</crypto:pgp-key-infos>
+	</crypto:pgp-config>
+	<crypto:pgp-config name="Crypto_Pgp1" doc:name="Crypto Pgp" doc:id="7df6b83b-1d28-4eb1-9707-047708791be2" privateKeyring="mule_private.gpg" >
+		<crypto:pgp-key-infos >
+			<crypto:pgp-asymmetric-key-info keyId="lucky1234" fingerprint="58CE643E4619AB23" passphrase="mulesoft123" />
+		</crypto:pgp-key-infos>
+	</crypto:pgp-config>
+	<flow name="pgpFlow" doc:id="d28bcf51-a4b3-4ce0-a518-55a046885256" >
+		<http:listener doc:name="Listener" doc:id="f51efad2-d43d-4732-96b4-44b588376c16" config-ref="HTTP_Listener_config" path="/pgp"/>
+		<crypto:pgp-encrypt doc:name="Pgp encrypt" doc:id="63810d9f-5499-4e9e-a76d-528977bdc741" config-ref="Crypto_Pgp" keyId="lucky1234"/>
+	</flow>
+	<flow name="pgpFlow1" doc:id="b4e446ab-a91c-4662-8385-f8ebd9417a52" >
+		<http:listener doc:name="Listener" doc:id="8da2ba1c-0d55-424a-b519-b990160cf7cd" config-ref="HTTP_Listener_config" path="/pgpdecrypt"/>
+		<crypto:pgp-decrypt doc:name="Pgp decrypt" doc:id="c5ffd613-ab9f-4a2b-b5a7-a9c0d66738d0" config-ref="Crypto_Pgp1"/>
+	</flow>
+</mule>
